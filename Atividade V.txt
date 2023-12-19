@@ -1,0 +1,178 @@
+---NAT
+
+hostname Willian
+
+ip cef
+no ipv6 cef
+
+interface FastEthernet0/0
+ ip address 172.180.0.1 255.255.255.128
+ ip nat inside
+ duplex auto
+ speed auto
+
+interface FastEthernet1/0
+ no ip address
+ duplex auto
+ speed auto
+ shutdown
+
+interface Serial2/0
+ ip address 176.180.1.1 255.255.255.252
+ clock rate 64000
+
+interface Serial3/0
+ ip address 176.180.1.5 255.255.255.252
+ clock rate 64000
+
+interface FastEthernet4/0
+ no ip address
+ shutdown
+
+interface FastEthernet5/0
+ no ip address
+ shutdown
+
+interface Serial6/0
+ ip address 202.63.3.1 255.255.255.252
+ ip nat outside
+
+router ospf 1
+ log-adjacency-changes
+ network 172.180.0.0 0.0.0.3 area 1
+ network 172.180.1.0 0.0.0.3 area 1
+ network 172.180.1.4 0.0.0.3 area 1
+ network 172.180.0.0 0.0.0.127 area 1
+ network 172.180.1.0 0.0.0.3 area 1
+ network 176.180.1.0 0.0.0.3 area 1
+ network 176.180.1.4 0.0.0.3 area 1
+ network 202.68.3.0 0.0.0.3 area 1
+
+router rip
+
+ip nat inside source list 1 interface Serial6/0 overload
+ip classless
+
+ip flow-export version 9
+
+
+access-list 1 permit any
+
+line con 0
+
+line aux 0
+
+line vty 0 4
+ login
+
+end
+
+---HRSP
+
+
+hostname Diego
+
+ip cef
+no ipv6 cef
+
+interface FastEthernet0/0
+ ip address 172.180.8.1 255.255.255.128
+ duplex auto
+ speed auto
+ standby 1 ip 192.168.2.180
+ standby 1 priority 150
+
+interface FastEthernet1/0
+ no ip address
+ duplex auto
+ speed auto
+ shutdown
+
+interface Serial2/0
+ ip address 176.180.1.2 255.255.255.252
+
+interface Serial3/0
+ ip address 176.180.1.9 255.255.255.252
+ clock rate 64000
+
+interface FastEthernet4/0
+ no ip address
+ shutdown
+
+interface FastEthernet5/0
+ no ip address
+ shutdown
+
+router ospf 1
+ log-adjacency-changes
+ network 172.180.8.0 0.0.0.127 area 1
+ network 176.180.1.0 0.0.0.3 area 1
+ network 176.180.1.8 0.0.0.3 area 1
+
+ip classless
+
+ip flow-export version 9
+
+line con 0
+
+line aux 0
+
+line vty 0 4
+ login
+
+end
+
+---ACL
+
+hostname Silva
+
+ip cef
+no ipv6 cef
+
+interface FastEthernet0/0
+ ip address 172.180.16.1 255.255.255.128
+ ip access-group 1 in
+ duplex auto
+ speed auto
+
+interface FastEthernet1/0
+ no ip address
+ duplex auto
+ speed auto
+ shutdown
+
+interface Serial2/0
+ ip address 176.180.1.6 255.255.255.252
+
+interface Serial3/0
+ ip address 176.180.1.10 255.255.255.252
+
+interface FastEthernet4/0
+ no ip address
+ shutdown
+
+interface FastEthernet5/0
+ no ip address
+ shutdown
+
+router ospf 1
+ log-adjacency-changes
+ network 172.180.16.0 0.0.0.127 area 1
+ network 176.180.1.4 0.0.0.3 area 1
+ network 176.180.1.8 0.0.0.3 area 1
+
+ip classless
+
+ip flow-export version 9
+
+access-list 1 deny host 172.180.16.20
+access-list 1 permit any
+
+line con 0
+
+line aux 0
+
+line vty 0 4
+ login
+
+end
